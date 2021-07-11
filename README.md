@@ -8,6 +8,11 @@ Facial recognition is based on Facenet model.
 
 Team members:
 **[Susanta Biswas](https://github.com/susantabiswas)** and **[Aditya Singh](https://github.com/adibyte95)**
+For installing
+1. install `pipenv` using `pip3 install --user pipenv` \
+2. cd to your working directory
+3. activate the environment by typing `pipenv shell`\
+4. once environment is activated, you can install the required packages using `pipenv install`\
 
 For running:
 1. first run
