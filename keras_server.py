@@ -1,17 +1,17 @@
-# Python code for Keras Server
+# Python code for tf.keras Server
 
 # Usage
 # Starting the server:
-# python keras_server.py
+# python tf.keras_server.py
 # 'http://localhost:5000/predict'
 #  Client request can be given by:
 #	python simple_request.py
 
 # import the necessary packages
 
-import keras 
-from keras import *
-from keras.models import load_model
+import tensorflow.keras as keras
+from tensorflow.keras import *
+from tensorflow.keras.models import load_model
 import numpy as np
 import tensorflow as tf
 import os
@@ -24,6 +24,7 @@ import pickle
 import cv2
 import os.path
 from utility import img_to_encoding, resize_img
+from architecture import *
 from PIL import Image
 import flask
 from flask import request, url_for, Response
@@ -72,8 +73,8 @@ def face_present(image_path):
         # required region for the face
         roi_color = img[y-90:y+h+70, x-50:x+w+50]
         
-        # crop to 96 X 96, required by the model
-        roi_color = cv2.resize(roi_color, (96, 96))
+        # crop to 160 X 160, required by the model
+        roi_color = cv2.resize(roi_color, (160, 160))
         # save the detected face
         cv2.imwrite(save_loc, roi_color)
         # make face present as true
@@ -91,7 +92,8 @@ def face_present(image_path):
 # for loading the facenet trained model 
 def load_FRmodel():
     global model
-    model = load_model('models/model.h5', custom_objects={'triplet_loss': triplet_loss})
+    model = InceptionResNetV2()
+    model.load_weights('models/model2.h5')
     model.summary()
 
 
@@ -111,7 +113,7 @@ def ini_user_database():
 
 
 # for checking if the given input face is of a registered user or not
-def face_recognition(encoding, database, model, threshold=0.6):
+def face_recognition(encoding, database, model, threshold=12.0):
     min_dist = 99999
     # keeps track of user authentication status
     authenticate = False
@@ -119,6 +121,7 @@ def face_recognition(encoding, database, model, threshold=0.6):
     for email in database.keys():
         # find the similarity between the input encodings and claimed person's encodings using L2 norm
         dist = np.linalg.norm(np.subtract(database[email]['encoding'], encoding))
+        print('yawa',dist)
         # check if minimum distance or not
         if dist < min_dist:
             min_dist = dist
@@ -306,7 +309,7 @@ def predict():
                 # find image encoding and see if the image is of a registered user or not
                 encoding = img_to_encoding('saved_image/new.jpg', model)
                 min_dist, identity, authenticate = face_recognition(
-                                                    encoding, user_db, model, threshold=0.9)
+                                                    encoding, user_db, model, threshold=6.0)
                 
                 # save the output for sending as json
                 data["min_dist"] = str(min_dist)
@@ -354,4 +357,4 @@ if __name__ == "__main__":
     print('Model loaded..............')
     ini_user_database()
     print('Database loaded...........')
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
