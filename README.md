@@ -12,7 +12,7 @@ For installing
 1. install `pipenv` using `pip3 install --user pipenv` \
 2. cd to your working directory
 3. activate the environment by typing `pipenv shell`\
-4. once environment is activated, you can install the required packages using `pipenv install`\
+4. once environment is activated, you can install the required packages using `pipenv install` or `pipenv run install -r requirements.txt`\
 
 For running:
 1. first run
